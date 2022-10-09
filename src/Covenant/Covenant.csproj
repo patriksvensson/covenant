@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <PackAsTool>true</PackAsTool>
+    <PackageId>Covenant</PackageId>
+    <ToolCommandName>dotnet-covenant</ToolCommandName>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package Information">
+    <Description>A dotnet tool that generate SBOM:s from source code artifacts.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\**" />
+    <EmbeddedResource Remove="Features\**" />
+    <None Remove="Features\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Reporting\Templates\Template.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\stylecop.json" Link="Properties/stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Reporting\Templates\Template.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Buildalyzer" Version="4.1.4" />
+    <PackageReference Include="Microsoft.Build" Version="17.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NuGet.Packaging" Version="6.2.0" />
+    <PackageReference Include="Rosetta" Version="0.5.0" />
+    <PackageReference Include="Scriban" Version="5.5.0" />
+    <PackageReference Include="Semver" Version="2.3.0-alpha.0" />
+    <PackageReference Include="Spectre.Console" Version="0.45.0" />
+    <PackageReference Include="Spectre.Console.Analyzer" Version="0.45.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Spectre.IO" Version="0.8.0" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Covenant.Core\Covenant.Core.csproj" />
+    <ProjectReference Include="..\Covenant.CycloneDx\Covenant.CycloneDx.csproj" />
+    <ProjectReference Include="..\Covenant.Spdx\Covenant.Spdx.csproj" />
+  </ItemGroup>
+
+</Project>
