@@ -40,13 +40,15 @@ public sealed class ReportContext
         Licenses = _bom.Components
             .Where(c => c.License?.Id != null || c.License?.Expression != null)
             .OrderByDescending(c => c.License?.Id != null)
-            .GroupBy(c => c.License?.Id
-                ?? c.License?.Expression
-                ?? throw new InvalidOperationException("Invalid license"))
+            .GroupBy(
+                c => c.License?.Id
+                    ?? c.License?.Expression
+                    ?? throw new InvalidOperationException("Invalid license"),
+                StringComparer.Ordinal)
             .ToDictionary(
                 c => c.Key,
                 v => v.Count(),
-                StringComparer.OrdinalIgnoreCase);
+                StringComparer.Ordinal);
 
         DistinctTextLicenseCount = new HashSet<string>(
             _bom.Components
@@ -56,14 +58,16 @@ public sealed class ReportContext
 
         UnknownLicenses = _bom.Components
             .Where(c => c.License != null && c.License?.Id == null && c.License?.Expression == null && c.License?.Text == null)
-            .GroupBy(c => c.License?.Id
-                ?? c.License?.Name
-                ?? c.License?.Url
-                ?? throw new InvalidOperationException("Invalid license"))
+            .GroupBy(
+                c => c.License?.Id
+                    ?? c.License?.Name
+                    ?? c.License?.Url
+                    ?? throw new InvalidOperationException("Invalid license"),
+                StringComparer.Ordinal)
             .ToDictionary(
                 c => c.Key,
                 v => v.Count(),
-                StringComparer.OrdinalIgnoreCase);
+                StringComparer.Ordinal);
 
         NoLicenseCount = _bom.Components
             .Where(c => c.Kind != BomComponentKind.Root)
