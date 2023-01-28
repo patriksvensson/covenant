@@ -97,6 +97,7 @@ internal static class CycloneDxConverter
         var result = new CycloneComponent
         {
             BomRef = component.Purl,
+            Purl = component.Purl,
             Name = component.Name,
             Version = component.Version,
             Type = ConvertKind(component.Kind),
