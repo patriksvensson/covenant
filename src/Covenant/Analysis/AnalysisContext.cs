@@ -9,14 +9,21 @@ public sealed class AnalysisContext : DiagnosticContext
     public IReadOnlyGraph<BomComponent> Delta => _localGraph;
     public DirectoryPath Root { get; }
     public ICommandLineResolver Cli { get; }
+    public CovenantConfiguration Configuration { get; }
 
-    public AnalysisContext(DirectoryPath root, Graph<BomComponent> graph, ICommandLineResolver resolver)
+    public AnalysisContext(
+        DirectoryPath root,
+        Graph<BomComponent> graph,
+        AnalysisSettings settings)
     {
+        ArgumentNullException.ThrowIfNull(settings);
+
         _graph = graph ?? throw new ArgumentNullException(nameof(graph));
         _localGraph = new Graph<BomComponent>(BomComponentComparer.Shared);
 
         Root = root ?? throw new ArgumentNullException(nameof(root));
-        Cli = resolver ?? throw new ArgumentNullException(nameof(resolver));
+        Cli = settings.Cli;
+        Configuration = settings.Configuration;
     }
 
     public BomComponent AddComponent(BomComponent component)

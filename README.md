@@ -24,6 +24,34 @@ Install by running the following command:
 dotnet tool install covenant
 ```
 
+## Configuration file
+
+The configuration file is used to configure different aspects of Covenant.
+
+```json
+{
+    "$schema": "https://raw.githubusercontent.com/patriksvensson/covenant/main/schema/0.14.json"
+    
+    // Used for arbitrary files to be included in the SBOM (optional)
+    "files": [
+        {
+            "path": "./files/lol.txt",
+            "license": "MIT"
+        },
+        {
+            "path": "./**/foo.c"
+        }
+    ],
+    
+    // Used for compliance checks (optional)
+    "licenses": { 
+        "banned": [
+            "MIT"
+        ]
+    }
+}
+```
+
 ## Generate Covenant SBOM
 
 ```
@@ -34,12 +62,14 @@ Arguments:
   <PATH>  A file or directory to use as input
 
 Options:
-  -o, --output <FILE>      The output path of the SBOM file
-  -n, --name <NAME>        The SBOM name
-  -v, --version <VERSION>  The SBOM version [default: 0.0.0]
-  --design-time-build      Performs a design time build for .NET projects [default: False]
-  --no-dev-dependencies    Excludes dev dependencies [default: False]
-  -?, -h, --help           Show help and usage information
+  -o, --output <FILE>         The output path of the SBOM file
+  -n, --name <NAME>           The SBOM name
+  -v, --version <VERSION>     The SBOM version [default: 0.0.0]
+  -m, --metadata <metadata>   Arbitrary metadata in the form 'key=value'
+  -c, --configuration <FILE>  The Covenant configuration file to use
+  --design-time-build         Performs a design time build for .NET projects [default: False]
+  --no-dev-dependencies       Excludes dev dependencies for NPM projects [default: False]
+  -?, -h, --help              Show help and usage information
 ```
 
 To generate an Covenant SBOM from the current directory:
@@ -60,7 +90,7 @@ To generate an Covenant SBOM from a specific file:
 dotnet covenant generate "C:\Source\Foo\Foo.sln"
 ```
 
-## Convert Covenant SBOM to external SBOM formats
+## Convert Covenant SBOM to third party SBOM formats
 
 ```
 Usage:

@@ -17,10 +17,8 @@ internal sealed class CommandLineParser
             Description = "SBOM generator for the masses",
         };
 
-        var analyzers = _services.GetServices<Analyzer>();
-        var pipeline = _services.GetServices<ICovenantMiddleware>();
-
         // Create generate command
+        var analyzers = _services.GetServices<Analyzer>();
         var generate = CreateGenerateCommand(analyzers);
 
         // Create convert command
@@ -81,6 +79,12 @@ internal sealed class CommandLineParser
         };
         versionOption.SetDefaultValue("0.0.0");
 
+        // Configuration
+        var configurationOption = new Option<string?>(new[] { "-c", "--configuration" }, "The Covenant configuration file to use")
+        {
+            ArgumentHelpName = "FILE",
+        };
+
         var metadataOption = new Option<Dictionary<string, string>>(
               new[] { "-m", "--metadata" },
               parseArgument: input =>
@@ -118,6 +122,7 @@ internal sealed class CommandLineParser
             nameOption,
             versionOption,
             metadataOption,
+            configurationOption,
         };
 
         var augmentor = new CommandLineAugmentor(command);
@@ -130,6 +135,13 @@ internal sealed class CommandLineParser
         {
             augmentor.ParseResult = ctx.ParseResult;
 
+            var configuration = ctx.ParseResult.GetValueForOption(configurationOption);
+            var configurationPath = default(FilePath?);
+            if (configuration != null)
+            {
+                configurationPath = new FilePath(configuration);
+            }
+
             var command = _services.GetRequiredService<GenerateCommand>();
             ctx.ExitCode = command.Analyze(
                 new GenerateCommandSettings(augmentor)
@@ -139,6 +151,7 @@ internal sealed class CommandLineParser
                     Name = ctx.ParseResult.GetValueForOption(nameOption),
                     Version = ctx.ParseResult.GetValueForOption(versionOption),
                     Metadata = ctx.ParseResult.GetValueForOption(metadataOption),
+                    Configuration = configurationPath,
                 });
         });
 

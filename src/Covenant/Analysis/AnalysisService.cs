@@ -40,7 +40,7 @@ public sealed class AnalysisService
 
             foreach (var path in GetFilePaths(analyzer, settings))
             {
-                var context = new AnalysisContext(root, graph, settings.Cli);
+                var context = new AnalysisContext(root, graph, settings);
 
                 if (analyzer.CanHandle(context, path))
                 {

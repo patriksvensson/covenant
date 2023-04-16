@@ -6,6 +6,7 @@ internal sealed class GenerateCommand
     private readonly IEnvironment _environment;
     private readonly IFileSystem _fileSystem;
     private readonly AnalysisService _analysis;
+    private readonly CovenantConfigurationReader _reader;
     private readonly IReadOnlyList<ICovenantMiddleware> _middlewares;
 
     public GenerateCommand(
@@ -13,12 +14,14 @@ internal sealed class GenerateCommand
         IEnvironment environment,
         IFileSystem fileSystem,
         AnalysisService analysis,
+        CovenantConfigurationReader reader,
         IEnumerable<ICovenantMiddleware> middleware)
     {
         _console = console ?? throw new ArgumentNullException(nameof(console));
         _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _analysis = analysis ?? throw new ArgumentNullException(nameof(analysis));
+        _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         _middlewares = new List<ICovenantMiddleware>(middleware);
     }
 
@@ -30,8 +33,10 @@ internal sealed class GenerateCommand
         var (result, diagnostics) = _console.Status()
             .Start("Analyzing...", ctx =>
             {
+                var configuration = GetConfiguration(settings);
+
                 var result = _analysis.Analyze(
-                    new AnalysisSettings(settings.Resolver)
+                    new AnalysisSettings(configuration, settings.Resolver)
                     {
                         Input = settings.Input,
                         Name = GetName(settings),
@@ -42,19 +47,20 @@ internal sealed class GenerateCommand
                     },
                     out var diagnostics);
 
-                if (result != null)
+                // Make sure we have a BOM
+                result ??= new Bom(GetName(settings), settings.Version ?? "0.0.0");
+
+                // Process the BOM using middleware
+                // TODO: refine this a bit later
+                ctx.Status("Processing...");
+                var middlewareCtx = new MiddlewareContext(GetInputPath(settings).FullPath, configuration, settings.Resolver);
+                foreach (var middleware in _middlewares.OrderBy(m => m.Order))
                 {
-                    ctx.Status("Processing...");
-
-                    // Add the metadata to the BOM
-
-                    // Process the BOM using middleware
-                    // TODO: refine this a bit later
-                    foreach (var component in _middlewares)
-                    {
-                        result = component.Process(result, settings.Resolver);
-                    }
+                    result = middleware.Process(middlewareCtx, result);
                 }
+
+                // Merge diagnostics
+                diagnostics = diagnostics.Merge(middlewareCtx.Diagnostics);
 
                 return (result, diagnostics);
             });
@@ -105,8 +111,31 @@ internal sealed class GenerateCommand
 
         _console.WriteLine();
         _console.MarkupLine($"Wrote [blue]Covenant[/] SBOM to [yellow]{output.FullPath}[/]");
-
         return 0;
+    }
+
+    private CovenantConfiguration GetConfiguration(GenerateCommandSettings settings)
+    {
+        var configurationPath = settings.Configuration ?? GetInputPath(settings).CombineWithFilePath("covenant.config");
+        var configuration = _reader.Read(configurationPath.MakeAbsolute(_environment));
+        if (configuration == null)
+        {
+            // Create an empty configuration
+            configuration = new CovenantConfiguration();
+        }
+
+        return configuration;
+    }
+
+    private DirectoryPath GetInputPath(GenerateCommandSettings settings)
+    {
+        if (settings.Input != null)
+        {
+            return new DirectoryPath(settings.Input)
+                .MakeAbsolute(_environment);
+        }
+
+        return _environment.WorkingDirectory.MakeAbsolute(_environment);
     }
 
     private FilePath GetOutputPath(GenerateCommandSettings settings)
@@ -120,6 +149,7 @@ internal sealed class GenerateCommand
 
         var root = _environment.WorkingDirectory;
 
+        // Got an input path?
         if (!string.IsNullOrWhiteSpace(settings.Input)
             && _fileSystem.Directory.Exists(settings.Input))
         {

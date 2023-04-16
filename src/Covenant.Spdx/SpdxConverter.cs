@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Covenant.Spdx;
 
 internal static class SpdxConverter
@@ -41,6 +43,36 @@ internal static class SpdxConverter
                     counter++;
                 }
             }
+        }
+
+        // Add files
+        foreach (var file in bom.Files)
+        {
+            document.Files.Add(new SpdxFile
+            {
+                SpdxId = $"SPDXRef-{file.Path.ToSpdxId()}",
+                Filename = file.Path,
+                LicenseConcluded = file.License?.Id ?? "NOASSERTION",
+                Checksums =
+                {
+                    new SpdxChecksum
+                    {
+                        Algorithm = file.Hash.Algorithm.ToString(),
+                        Value = file.Hash.Content,
+                    },
+                },
+            });
+        }
+
+        // Add relationship between document and files.
+        foreach (var file in bom.Files)
+        {
+            document.Relationships.Add(new SpdxRelationship
+            {
+                Identifier = document.SpdxId,
+                Type = "DESCRIBES",
+                RelatedIdentifier = $"SPDXRef-{file.Path.ToSpdxId()}",
+            });
         }
 
         // Add components

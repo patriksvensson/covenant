@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covenant", "Covenant\Covena
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covenant.CycloneDx", "Covenant.CycloneDx\Covenant.CycloneDx.csproj", "{BB9AAD3B-C7D4-48D0-A13F-BA9D3921FF81}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Meta", "Meta", "{448EAD92-5F63-41E7-8335-5A1025E693A5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{448EAD92-5F63-41E7-8335-5A1025E693A5}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
@@ -20,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Covenant.Spdx", "Covenant.Spdx\Covenant.Spdx.csproj", "{19C26301-8796-4179-8C4C-364901C0CC0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serializers", "Serializers", "{B6FD3B25-771C-4EFB-A95A-F9F5CC01A910}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covenant.Tests", "Covenant.Tests\Covenant.Tests.csproj", "{A091C8B3-E324-46CE-96C3-277F60C2C721}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,18 @@ Global
 		{19C26301-8796-4179-8C4C-364901C0CC0D}.Release|x64.Build.0 = Release|Any CPU
 		{19C26301-8796-4179-8C4C-364901C0CC0D}.Release|x86.ActiveCfg = Release|Any CPU
 		{19C26301-8796-4179-8C4C-364901C0CC0D}.Release|x86.Build.0 = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|x64.Build.0 = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Debug|x86.Build.0 = Debug|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|x64.ActiveCfg = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|x64.Build.0 = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|x86.ActiveCfg = Release|Any CPU
+		{A091C8B3-E324-46CE-96C3-277F60C2C721}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
