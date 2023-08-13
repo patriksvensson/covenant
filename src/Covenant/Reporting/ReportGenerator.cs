@@ -11,6 +11,7 @@ public sealed class ReportGenerator
         var template = Template.Parse(templateHtml);
 
         // Render template
-        return template.Render(new { bom = new ReportContext(bom) });
+        var context = new ReportContext(bom);
+        return template.Render(new { bom = context });
     }
 }

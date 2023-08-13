@@ -74,6 +74,30 @@ internal static class CycloneDxConverter
             }
         }
 
+        foreach (var file in bom.Files)
+        {
+            var component = new CycloneComponent
+            {
+                Type = CycloneComponent.Classification.File,
+                BomRef = file.Path,
+                Name = file.Path,
+                Hashes = new List<CycloneHash>
+                {
+                    ConvertHash(file.Hash),
+                },
+            };
+
+            if (file.License != null)
+            {
+                component.Licenses = new List<CycloneLicenseChoice>
+                {
+                    ConvertLicense(file.License),
+                };
+            }
+
+            result.Components.Add(component);
+        }
+
         foreach (var component in bom.Components)
         {
             result.Components.Add(ConvertComponent(component));

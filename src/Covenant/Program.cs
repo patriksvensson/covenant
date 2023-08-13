@@ -26,6 +26,7 @@ public static class Program
         services.AddSingleton<ReportGenerator>();
 
         services.AddSingleton<ICovenantMiddleware, LicenseDetectorMiddleware>();
+        services.AddSingleton<ICovenantMiddleware, FileMiddleware>();
         services.AddSingleton<BomSerializer, CycloneDxSerializer>();
         services.AddSingleton<BomSerializer, SpdxSerializer>();
 

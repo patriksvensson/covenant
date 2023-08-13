@@ -32,20 +32,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Buildalyzer" Version="4.1.4" />
-    <PackageReference Include="Microsoft.Build" Version="17.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NuGet.Packaging" Version="6.2.0" />
+    <PackageReference Include="Buildalyzer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NuGet.Packaging" Version="6.5.0" />
     <PackageReference Include="Rosetta" Version="0.5.0" />
-    <PackageReference Include="Scriban" Version="5.5.0" />
-    <PackageReference Include="Semver" Version="2.3.0-alpha.0" />
-    <PackageReference Include="Spectre.Console" Version="0.45.0" />
-    <PackageReference Include="Spectre.Console.Analyzer" Version="0.45.0">
+    <PackageReference Include="Scriban" Version="5.7.0" />
+    <PackageReference Include="Semver" Version="2.3.0" />
+    <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    <PackageReference Include="Spectre.Console.Analyzer" Version="0.46.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Spectre.IO" Version="0.8.0" />
+    <PackageReference Include="Spectre.IO" Version="0.12.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 

@@ -13,10 +13,14 @@ public static class StringExtensions
         var array = new char[text.Length];
         foreach (var c in text)
         {
-            if (char.IsLetter(c) || char.IsDigit(c) ||
-               c == '.' || c == '-')
+            if (char.IsLetter(c) || char.IsDigit(c) || c == '.' || c == '-')
             {
                 array[index] = c;
+                index++;
+            }
+            else if (c == '/' || c == '\\')
+            {
+                array[index] = '-';
                 index++;
             }
         }

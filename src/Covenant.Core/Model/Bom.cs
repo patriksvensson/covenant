@@ -17,8 +17,10 @@ public sealed class Bom
     public List<BomMetadata> Metadata { get; init; }
 
     [JsonProperty(Order = 5)]
-    public List<BomComponent> Components { get; init; }
+    public List<BomFile> Files { get; init; }
     [JsonProperty(Order = 6)]
+    public List<BomComponent> Components { get; init; }
+    [JsonProperty(Order = 7)]
     public List<BomDependency> Dependencies { get; init; }
 
     public Bom(string name, string version)
@@ -31,6 +33,7 @@ public sealed class Bom
             typeof(Bom).Assembly.Location).ProductVersion ?? "0.0.0";
 
         Metadata = new List<BomMetadata>();
+        Files = new List<BomFile>();
         Components = new List<BomComponent>();
         Dependencies = new List<BomDependency>();
     }

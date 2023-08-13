@@ -2,12 +2,12 @@ namespace Covenant.Analysis.Npm;
 
 internal sealed class NpmVersionRange
 {
-    private readonly SemVersionRangeSet? _versionRangeSet;
+    private readonly SemVersionRange? _versionRangeSet;
     private readonly string? _text;
 
     public NpmVersionRange(string text)
     {
-        if (!SemVersionRangeSet.TryParseNpm(text, out _versionRangeSet))
+        if (!SemVersionRange.TryParseNpm(text, out _versionRangeSet))
         {
             _text = text;
         }

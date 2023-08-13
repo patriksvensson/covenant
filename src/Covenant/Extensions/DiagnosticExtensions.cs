@@ -133,12 +133,12 @@ public static class DiagnosticExtensions
 
 public sealed class EmptyRenderable : IRenderable
 {
-    public Measurement Measure(RenderContext context, int maxWidth)
+    public Measurement Measure(RenderOptions options, int maxWidth)
     {
         return new Measurement(0, maxWidth);
     }
 
-    public IEnumerable<Segment> Render(RenderContext context, int maxWidth)
+    public IEnumerable<Segment> Render(RenderOptions options, int maxWidth)
     {
         yield return Segment.Empty;
     }

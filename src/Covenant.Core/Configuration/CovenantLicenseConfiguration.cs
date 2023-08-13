@@ -1,6 +1,6 @@
 namespace Covenant;
 
-internal sealed class CovenantLicenseConfiguration
+public sealed class CovenantLicenseConfiguration
 {
     public HashSet<string> Banned { get; }
 

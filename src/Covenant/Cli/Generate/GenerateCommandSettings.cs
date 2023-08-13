@@ -9,6 +9,7 @@ public sealed class GenerateCommandSettings
     public string? Name { get; set; }
     public string? Version { get; set; }
     public Dictionary<string, string>? Metadata { get; set; }
+    public FilePath? Configuration { get; set; }
 
     public GenerateCommandSettings(ICommandLineResolver resolver)
     {

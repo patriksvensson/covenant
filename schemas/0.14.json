@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "files": {
+        "type": "array",
+        "title": "Files",
+        "description": "Files to add to the Covenant SBOM",
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "title": "Path",
+                "description": "The file path. May include wildcards."
+              },
+              "license": {
+                "type": "string",
+                "title": "License",
+                "description": "The file's SPDX license identifier."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        ]
+      },
+      "licenses": {
+        "type": "object",
+        "title": "Licenses",
+        "description": "Contains information about licenses.",
+        "properties": {
+          "banned": {
+            "type": "array",
+            "title": "Banned licenses",
+            "description": "An array of SPDX license to ban.",
+            "items": [
+              {
+                "type": "string",
+                "title": "Banned license",
+                "description": "An SPDX license to ban."
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
