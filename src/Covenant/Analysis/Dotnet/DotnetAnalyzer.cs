@@ -34,6 +34,7 @@ internal class DotnetAnalyzer : Analyzer
     public override void Initialize(ICommandLineAugmentor cli)
     {
         cli.AddOption<bool>(DesignTimeBuildFlag, "Performs a design time build for .NET projects", false);
+        cli.AddOption<bool>(DisableDotnet, "Disables the .NET analyzer", false);
     }
 
     public override void BeforeAnalysis(AnalysisSettings settings)
