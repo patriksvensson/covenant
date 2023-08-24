@@ -19,6 +19,12 @@ public sealed class Graph<T> : IReadOnlyGraph<T>
         _edges = new HashSet<GraphEdge<T>>();
     }
 
+    public void Clear()
+    {
+        _nodes.Clear();
+        _edges.Clear();
+    }
+
     public T Add(T node)
     {
         if (node == null)

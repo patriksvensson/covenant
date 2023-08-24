@@ -33,14 +33,18 @@ public sealed class AnalysisService
 
         foreach (var analyzer in _analyzers)
         {
+            analyzer.BeforeAnalysis(settings);
+
             if (!analyzer.Enabled)
             {
                 continue;
             }
 
+            var context = new AnalysisContext(root, graph, settings);
+
             foreach (var path in GetFilePaths(analyzer, settings))
             {
-                var context = new AnalysisContext(root, graph, settings);
+                context.Reset();
 
                 if (analyzer.CanHandle(context, path))
                 {
@@ -74,6 +78,8 @@ public sealed class AnalysisService
                     diagnostics = diagnostics.Merge(context.Diagnostics);
                 }
             }
+
+            analyzer.AfterAnalysis(settings);
         }
 
         return new Bom(settings.Name ?? "Unknown", settings.Version ?? "0.0.0")

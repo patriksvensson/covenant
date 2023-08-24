@@ -7,6 +7,7 @@ namespace Covenant.Analysis.Dotnet;
 internal class DotnetAnalyzer : Analyzer
 {
     private const string DesignTimeBuildFlag = "--design-time-build";
+    private const string DisableDotnet = "--disable-dotnet";
 
     private readonly IFileSystem _fileSystem;
     private readonly IEnvironment _environment;
@@ -14,7 +15,9 @@ internal class DotnetAnalyzer : Analyzer
     private readonly NuspecLicenseReader _nuspecReader;
     private readonly DotnetAssetFileReader _assetFileReader;
     private readonly AnalyzerManager _analyzerManager;
+    private bool _enabled = true;
 
+    public override bool Enabled => _enabled;
     public override string[] Patterns { get; } = new[] { "**/*.sln" };
 
     public DotnetAnalyzer(
@@ -31,6 +34,14 @@ internal class DotnetAnalyzer : Analyzer
     public override void Initialize(ICommandLineAugmentor cli)
     {
         cli.AddOption<bool>(DesignTimeBuildFlag, "Performs a design time build for .NET projects", false);
+    }
+
+    public override void BeforeAnalysis(AnalysisSettings settings)
+    {
+        if (settings.Cli.GetOption<bool>(DisableDotnet))
+        {
+            _enabled = false;
+        }
     }
 
     public override bool ShouldTraverse(DirectoryPath path)
