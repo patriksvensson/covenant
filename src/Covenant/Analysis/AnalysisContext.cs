@@ -26,6 +26,11 @@ public sealed class AnalysisContext : DiagnosticContext
         Configuration = settings.Configuration;
     }
 
+    internal void Reset()
+    {
+        _localGraph.Clear();
+    }
+
     public BomComponent AddComponent(BomComponent component)
     {
         // Already known?

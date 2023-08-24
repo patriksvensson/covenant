@@ -3,14 +3,31 @@ namespace Covenant.Analysis.Npm;
 internal sealed class NpmAnalyzer : Analyzer
 {
     private const string NoDevDependenciesFlag = "--no-dev-dependencies";
+    private const string DisableNpm = "--disable-npm";
 
     private readonly NpmAssetReader _assetReader;
+    private bool _enabled = true;
 
+    public override bool Enabled => _enabled;
     public override string[] Patterns { get; } = new[] { "**/package.json" };
 
     public NpmAnalyzer(IFileSystem fileSystem, IEnvironment environment)
     {
         _assetReader = new NpmAssetReader(fileSystem, environment);
+    }
+
+    public override void Initialize(ICommandLineAugmentor cli)
+    {
+        cli.AddOption<bool>(NoDevDependenciesFlag, "Excludes dev dependencies for NPM projects", false);
+        cli.AddOption<bool>(DisableNpm, "Disables the NPM analyzer", false);
+    }
+
+    public override void BeforeAnalysis(AnalysisSettings settings)
+    {
+        if (settings.Cli.GetOption<bool>(DisableNpm))
+        {
+            _enabled = false;
+        }
     }
 
     public override bool ShouldTraverse(DirectoryPath path)
@@ -22,11 +39,6 @@ internal sealed class NpmAnalyzer : Analyzer
     {
         return path.GetFilename().FullPath.Equals("package.json", StringComparison.OrdinalIgnoreCase) ||
             path.GetFilename().FullPath.Equals("package-lock.json", StringComparison.OrdinalIgnoreCase);
-    }
-
-    public override void Initialize(ICommandLineAugmentor cli)
-    {
-        cli.AddOption<bool>(NoDevDependenciesFlag, "Excludes dev dependencies for NPM projects", false);
     }
 
     public override void Analyze(AnalysisContext context, FilePath path)
