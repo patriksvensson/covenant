@@ -54,16 +54,17 @@ internal class DotnetAnalyzer : Analyzer
     public override bool CanHandle(AnalysisContext context, FilePath path)
     {
         var isSolution = path.GetExtension()?.Equals(".sln", StringComparison.OrdinalIgnoreCase) ?? false;
-        var isProject = path.GetExtension()?.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ?? false;
-        return isSolution || isProject;
+        var isCsProject = path.GetExtension()?.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ?? false;
+        var isFsProject = path.GetExtension()?.Equals(".fsproj", StringComparison.OrdinalIgnoreCase) ?? false;
+        return isSolution || isCsProject || isFsProject;
     }
 
     public override void Analyze(AnalysisContext context, FilePath path)
     {
         path = path.MakeAbsolute(_environment);
-        var extension = path.GetExtension();
+        var extension = path.GetExtension() ?? string.Empty;
 
-        if (extension?.Equals(".sln", StringComparison.OrdinalIgnoreCase) ?? false)
+        if (extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
         {
             // Analyze solution
             var solution = SolutionFile.Parse(path.FullPath);
@@ -91,7 +92,8 @@ internal class DotnetAnalyzer : Analyzer
                 AnalyzeProjectDependencies(context, assetFile);
             }
         }
-        else if (extension?.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ?? false)
+        else if (extension.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ||
+                 extension.Equals(".fsproj", StringComparison.OrdinalIgnoreCase))
         {
             var assetsFile = ReadAssetFile(context, path);
             if (assetsFile != null)
