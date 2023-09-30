@@ -27,6 +27,7 @@ public static class BomLicenseDetector
         { "https://raw.githubusercontent.com/xunit/xunit.analyzers/master/LICENSE", "Apache-2.0" },
         { "https://github.com/dotnet/standard/blob/master/LICENSE.TXT", "MIT" },
         { "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT", "MIT" },
+        { "https://opensource.org/licenses/mpl-2.0", "MPL-2.0" },
     };
 
     private static readonly Dictionary<string, string> _hashes = new(StringComparer.OrdinalIgnoreCase)
