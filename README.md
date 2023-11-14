@@ -12,17 +12,23 @@ Covenant requires all projects to have been built, and all dependencies to have 
 
 ## Supported sources
 
-* .NET 5 / .NET 6
+* .NET 5 to .NET 8
 * .NET Core
 * NPM
 
 ## Installation
 
-Install by running the following command:
+Install by running the following command in your repository:
 
-```bash
-dotnet tool install covenant
+```shell
+$ dotnet tool install covenant
 ```
+
+You can also install Covenant globally on your machine:
+
+```shell
+$ dotnet tool install -g covenant
+``````
 
 ## Configuration file
 
