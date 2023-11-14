@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -34,32 +34,6 @@ jobs:
           global-json-file: global.json
 
       - name: Build
-        shell: bash
-        run: |
-          dotnet tool restore
-          dotnet cake
-
-  ###################################################
-  # PUBLISH
-  ###################################################
-
-  publish:
-    name: Publish
-    needs: [build]
-    if: "!contains(github.event.head_commit.message, 'skip-ci')"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Install .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          global-json-file: global.json
-
-      - name: Publish
         shell: bash
         run: |
           dotnet tool restore
