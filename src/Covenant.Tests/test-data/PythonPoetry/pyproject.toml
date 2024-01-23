@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "corvus-python"
+version = "0.1.0b15"
+description = ""
+authors = ["endjin <endjineers@endjin.com>"]
+
+[tool.poetry.dependencies]
+python = "~3.10"
+pyspark = "~3.3.1"
+delta-spark = "~2.2.0"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "~1.0.0"
+pandas = "~1.5.1"
+flake8 = "~6.1.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.1.2"
+pytest-cov = "^3.0.0"
+behave = "^1.2.6"
+junitparser = "^3.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

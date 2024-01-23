@@ -10,6 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="test-data\PythonPoetry\poetry.lock" />
+    <None Remove="test-data\PythonPoetry\pyproject.toml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="test-data\PythonPoetry\poetry.lock" />
+    <Content Include="test-data\PythonPoetry\pyproject.toml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Shouldly" Version="4.2.1" />
     <PackageReference Include="xunit" Version="2.6.1" />
