@@ -1,3 +1,5 @@
+using Bom = Covenant.Core.Model.Bom;
+
 namespace Covenant.CycloneDx;
 
 internal static class CycloneDxConverter
@@ -22,13 +24,18 @@ internal static class CycloneDxConverter
             Metadata = new CycloneMetadata
             {
                 Component = ConvertComponent(root),
-                Tools = new List<CycloneTool>
+                Tools = new CycloneToolChoices
                 {
-                    new CycloneTool
+#pragma warning disable CS0618 // Type or member is obsolete
+                    Tools = new List<CycloneTool>
                     {
-                        Name = "Covenant",
-                        Vendor = bom.ToolVendor,
-                        Version = bom.ToolVersion,
+                        new CycloneTool
+#pragma warning restore CS0618 // Type or member is obsolete
+                        {
+                            Name = "Covenant",
+                            Vendor = bom.ToolVendor,
+                            Version = bom.ToolVersion,
+                        },
                     },
                 },
                 Properties = new List<CycloneProperty>
@@ -189,7 +196,8 @@ internal static class CycloneDxConverter
         {
             BomComponentKind.Root => CycloneComponent.Classification.Application,
             BomComponentKind.Library => CycloneComponent.Classification.Library,
-            _ => throw new NotSupportedException("Unknown hash algorithm"),
+            BomComponentKind.Application => CycloneComponent.Classification.Application,
+            _ => throw new NotSupportedException("Unknown component kind"),
         };
     }
 

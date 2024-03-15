@@ -18,6 +18,13 @@ public sealed class Base64EncodedText
         Encoded = encoded ?? throw new ArgumentNullException(nameof(encoded));
     }
 
+    public static Base64EncodedText FromEncoded(string encoding)
+    {
+        var bytes = Convert.FromBase64String(encoding);
+        var decoded = Encoding.UTF8.GetString(bytes);
+        return new Base64EncodedText(decoded, encoding);
+    }
+
     public static Base64EncodedText? Encode(string? text)
     {
         if (text == null)

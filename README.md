@@ -15,6 +15,8 @@ Covenant requires all projects to have been built, and all dependencies to have 
 * .NET 5 to .NET 8
 * .NET Core
 * NPM
+* CycloneDX BOM
+  * `*.cdx.xml` or `bom.xml`
 
 ## Installation
 

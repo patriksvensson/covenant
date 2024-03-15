@@ -1,5 +1,6 @@
 using System.CommandLine.Parsing;
 using System.Threading.Tasks;
+using Covenant.Analysis.CycloneDx;
 using Covenant.Cli;
 using Covenant.Middleware;
 using Covenant.Spdx;
@@ -40,6 +41,7 @@ public static class Program
         services.AddSingleton<AnalysisService>();
         services.AddSingleton<Analyzer, DotnetAnalyzer>();
         services.AddSingleton<Analyzer, NpmAnalyzer>();
+        services.AddSingleton<Analyzer, CycloneDxAnalyzer>();
 
         services.AddSingleton<CovenantConfigurationReader>();
         services.AddSingleton<ComplianceChecker>();
