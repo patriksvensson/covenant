@@ -11,4 +11,5 @@ global using CycloneLicenseChoice = CycloneDX.Models.LicenseChoice;
 global using CycloneMetadata = CycloneDX.Models.Metadata;
 global using CycloneProperty = CycloneDX.Models.Property;
 global using CycloneTool = CycloneDX.Models.Tool;
+global using CycloneToolChoices = CycloneDX.Models.ToolChoices;
 global using CycloneXmlSerializer = CycloneDX.Xml.Serializer;

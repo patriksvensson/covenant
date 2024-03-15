@@ -4,4 +4,5 @@ public enum BomComponentKind
 {
     Root,
     Library,
+    Application,
 }

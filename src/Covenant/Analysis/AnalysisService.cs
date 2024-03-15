@@ -29,6 +29,7 @@ public sealed class AnalysisService
 
         var root = GetRoot(settings);
         var components = new HashSet<BomComponent>();
+        var files = new HashSet<BomFile>();
         var dependencies = new HashSet<BomDependency>();
 
         foreach (var analyzer in _analyzers)
@@ -56,6 +57,7 @@ public sealed class AnalysisService
 
                     // Add all new components
                     components.AddRange(context.Delta.Nodes);
+                    files.AddRange(context.DeltaFiles);
 
                     // Add all new dependencies
                     foreach (var node in context.Delta.Nodes)
@@ -86,6 +88,7 @@ public sealed class AnalysisService
         {
             Components = new List<BomComponent>(components),
             Dependencies = new List<BomDependency>(dependencies),
+            Files = new List<BomFile>(files),
             Metadata = settings.Metadata?.Select(
                 pair => new BomMetadata(pair.Key, pair.Value))?.ToList() ?? new List<BomMetadata>(),
         };

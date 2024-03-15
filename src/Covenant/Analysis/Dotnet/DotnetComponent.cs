@@ -3,7 +3,7 @@ namespace Covenant.Analysis.Dotnet;
 internal sealed class DotnetComponent : BomComponent<NuGetVersion>
 {
     public DotnetComponent(string name, NuGetVersion version, BomComponentKind kind = BomComponentKind.Library)
-        : base(version, GetBomRef(name, version, kind), name, version.OriginalVersion, kind)
+        : base(version, GetBomRef(name, version, kind), name, version.OriginalVersion ?? version.Version.ToString(3), kind)
     {
     }
 
