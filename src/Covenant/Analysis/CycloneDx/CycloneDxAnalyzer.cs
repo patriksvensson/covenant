@@ -7,13 +7,31 @@ using CycloneXmlSerializer = CycloneDX.Xml.Serializer;
 
 public sealed class CycloneDxAnalyzer : Analyzer
 {
+    private const string DisableCycloneDx = "--disable-cyclonedx";
+
     private readonly IFileSystem _fileSystem;
+    private bool _enabled;
 
     public override string[] Patterns { get; } = { "**/*.cdx.xml", "**/bom.xml" };
+    public override bool Enabled => _enabled;
 
     public CycloneDxAnalyzer(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        _enabled = true;
+    }
+
+    public override void Initialize(ICommandLineAugmentor cli)
+    {
+        cli.AddOption<bool>(DisableCycloneDx, "Disables the CycloneDX analyzer", false);
+    }
+
+    public override void BeforeAnalysis(AnalysisSettings settings)
+    {
+        if (settings.Cli.GetOption<bool>(DisableCycloneDx))
+        {
+            _enabled = false;
+        }
     }
 
     public override bool CanHandle(AnalysisContext context, FilePath path)
