@@ -17,6 +17,7 @@ public static class BomLicenseDetector
         { "Apache License Version 2.0", "Apache-2.0" },
         { "The MIT License (MIT)", "MIT" },
         { "MIT", "MIT" },
+        { "GNU LESSER GENERAL PUBLIC LICENSE 2.1", "LGPL-2.1" },
     };
 
     private static readonly Dictionary<string, string> _urls = new(StringComparer.OrdinalIgnoreCase)
@@ -28,6 +29,7 @@ public static class BomLicenseDetector
         { "https://github.com/dotnet/standard/blob/master/LICENSE.TXT", "MIT" },
         { "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT", "MIT" },
         { "https://opensource.org/licenses/mpl-2.0", "MPL-2.0" },
+        { "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html", "LGPL-2.1" },
     };
 
     private static readonly Dictionary<string, string> _hashes = new(StringComparer.OrdinalIgnoreCase)
