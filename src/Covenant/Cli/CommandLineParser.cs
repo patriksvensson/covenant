@@ -85,6 +85,9 @@ internal sealed class CommandLineParser
             ArgumentHelpName = "FILE",
         };
 
+        // No logo
+        var noLogoOption = new Option<bool>("--no-logo", "Do not show the Covenant logo");
+
         var metadataOption = new Option<Dictionary<string, string>>(
               new[] { "-m", "--metadata" },
               parseArgument: input =>
@@ -123,6 +126,7 @@ internal sealed class CommandLineParser
             versionOption,
             metadataOption,
             configurationOption,
+            noLogoOption,
         };
 
         var augmentor = new CommandLineAugmentor(command);
@@ -151,6 +155,7 @@ internal sealed class CommandLineParser
                     Name = ctx.ParseResult.GetValueForOption(nameOption),
                     Version = ctx.ParseResult.GetValueForOption(versionOption),
                     Metadata = ctx.ParseResult.GetValueForOption(metadataOption),
+                    NoLogo = ctx.ParseResult.GetValueForOption(noLogoOption),
                     Configuration = configurationPath,
                 });
         });

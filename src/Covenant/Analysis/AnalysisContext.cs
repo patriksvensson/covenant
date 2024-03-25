@@ -13,7 +13,7 @@ public sealed class AnalysisContext : DiagnosticContext
     public IReadOnlySet<BomFile> DeltaFiles => _localFiles;
     public DirectoryPath Root { get; }
     public ICommandLineResolver Cli { get; }
-    public CovenantConfiguration Configuration { get; }
+    public AnalysisConfiguration Configuration { get; }
 
     public AnalysisContext(
         DirectoryPath root,

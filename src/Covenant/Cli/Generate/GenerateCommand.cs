@@ -27,13 +27,20 @@ internal sealed class GenerateCommand
 
     public int Analyze(GenerateCommandSettings settings)
     {
-        _console.Write(new FigletText("Covenant").Color(Color.Yellow));
+        if (!settings.NoLogo)
+        {
+            _console.Write(new FigletText("Covenant").Color(Color.Yellow));
+        }
 
         // Perform analysis
         var (result, diagnostics) = _console.Status()
             .Start("Analyzing...", ctx =>
             {
-                var configuration = GetConfiguration(settings);
+                var configuration = new AnalysisConfiguration(
+                    _fileSystem,
+                    _environment,
+                    settings,
+                    GetConfiguration(settings));
 
                 var result = _analysis.Analyze(
                     new AnalysisSettings(configuration, settings.Resolver)
@@ -53,7 +60,7 @@ internal sealed class GenerateCommand
                 // Process the BOM using middleware
                 // TODO: refine this a bit later
                 ctx.Status("Processing...");
-                var middlewareCtx = new MiddlewareContext(GetInputPath(settings).FullPath, configuration, settings.Resolver);
+                var middlewareCtx = new MiddlewareContext(configuration.Root.FullPath, configuration.Configuration, settings.Resolver);
                 foreach (var middleware in _middlewares.OrderBy(m => m.Order))
                 {
                     result = middleware.Process(middlewareCtx, result);
@@ -116,7 +123,10 @@ internal sealed class GenerateCommand
 
     private CovenantConfiguration GetConfiguration(GenerateCommandSettings settings)
     {
-        var configurationPath = settings.Configuration ?? GetInputPath(settings).CombineWithFilePath("covenant.config");
+        var configurationPath = settings.Configuration ??
+                                settings.GetResolvedInputPath(_fileSystem, _environment)
+                                    .CombineWithFilePath("covenant.config");
+
         var configuration = _reader.Read(configurationPath.MakeAbsolute(_environment));
         if (configuration == null)
         {
@@ -125,17 +135,6 @@ internal sealed class GenerateCommand
         }
 
         return configuration;
-    }
-
-    private DirectoryPath GetInputPath(GenerateCommandSettings settings)
-    {
-        if (settings.Input != null)
-        {
-            return new DirectoryPath(settings.Input)
-                .MakeAbsolute(_environment);
-        }
-
-        return _environment.WorkingDirectory.MakeAbsolute(_environment);
     }
 
     private FilePath GetOutputPath(GenerateCommandSettings settings)

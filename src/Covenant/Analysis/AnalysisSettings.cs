@@ -9,11 +9,11 @@ public sealed class AnalysisSettings
     public Dictionary<string, string>? Metadata { get; set; }
 
     public IProgress<string>? Reporter { get; set; }
-    public CovenantConfiguration Configuration { get; }
+    public AnalysisConfiguration Configuration { get; }
     public ICommandLineResolver Cli { get; }
 
     public AnalysisSettings(
-        CovenantConfiguration configuration,
+        AnalysisConfiguration configuration,
         ICommandLineResolver cli)
     {
         Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));

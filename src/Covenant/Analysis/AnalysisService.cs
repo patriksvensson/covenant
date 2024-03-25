@@ -27,10 +27,22 @@ public sealed class AnalysisService
         var graph = new Graph<BomComponent>(BomComponentComparer.Shared);
         diagnostics = new List<Diagnostic>();
 
-        var root = GetRoot(settings);
+        var root = settings.Configuration.Root;
         var components = new HashSet<BomComponent>();
         var files = new HashSet<BomFile>();
         var dependencies = new HashSet<BomDependency>();
+
+        foreach (var excluded in settings.Configuration.ExcludedDirectories)
+        {
+            _console.MarkupLine($"Excluding directory [blue]{root.GetRelativePath(excluded)}/[/]");
+        }
+
+        foreach (var excluded in settings.Configuration.ExcludedFiles)
+        {
+            _console.MarkupLine($"Excluding file [blue]{root.GetRelativePath(excluded)}[/]");
+        }
+
+        _console.MarkupLine($"Analyzing [yellow]{root}[/]...");
 
         foreach (var analyzer in _analyzers)
         {
@@ -42,7 +54,6 @@ public sealed class AnalysisService
             }
 
             var context = new AnalysisContext(root, graph, settings);
-
             foreach (var path in GetFilePaths(analyzer, settings))
             {
                 context.Reset();
@@ -94,23 +105,6 @@ public sealed class AnalysisService
         };
     }
 
-    private DirectoryPath GetRoot(AnalysisSettings settings)
-    {
-        var root = _environment.WorkingDirectory;
-
-        if (settings.Input != null)
-        {
-            // Is this a directory?
-            if (_fileSystem.Directory.Exists(settings.Input))
-            {
-                // Use it as glob root
-                root = new DirectoryPath(settings.Input);
-            }
-        }
-
-        return root;
-    }
-
     private IEnumerable<FilePath> GetFilePaths(Analyzer analyzer, AnalysisSettings settings)
     {
         var root = _environment.WorkingDirectory;
@@ -137,14 +131,32 @@ public sealed class AnalysisService
             foreach (var path in _globber.Match(pattern, new GlobberSettings()
             {
                 Root = root,
-                Predicate = (directory) => _analyzers.All(a => a.ShouldTraverse(directory.Path)),
+                Predicate = p => ShouldTraverse(settings, p),
             }))
             {
                 if (path is FilePath file)
                 {
-                    yield return file;
+                    if (!settings.Configuration.ExcludedFiles.Contains(path, PathComparer.Default))
+                    {
+                        yield return file;
+                    }
                 }
             }
         }
+    }
+
+    private bool ShouldTraverse(AnalysisSettings settings, IDirectory path)
+    {
+        // Excluded?
+        foreach (var exludedPath in settings.Configuration.ExcludedDirectories)
+        {
+            if (path.Path.FullPath.StartsWith(exludedPath.FullPath))
+            {
+                return false;
+            }
+        }
+
+        // All analyzers think we should traverse it?
+        return _analyzers.All(a => a.ShouldTraverse(path.Path));
     }
 }

@@ -4,6 +4,7 @@ global using System.Diagnostics.CodeAnalysis;
 global using System.Reflection;
 global using System.Text;
 global using Covenant.Core.Model;
+global using JetBrains.Annotations;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Converters;
 global using Newtonsoft.Json.Serialization;
