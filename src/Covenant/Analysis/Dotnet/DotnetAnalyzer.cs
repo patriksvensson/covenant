@@ -78,11 +78,12 @@ internal class DotnetAnalyzer : Analyzer
             var assetFiles = new List<AssetFile>();
             foreach (var csproj in projects)
             {
-                var assetsFile = ReadAssetFile(context, new FilePath(csproj.AbsolutePath));
+                var (version, copyright, analyzerResult) = PerformDesignTimeBuild(context, csproj.AbsolutePath);
+                var assetsFile = ReadAssetFile(context, csproj.AbsolutePath, analyzerResult);
                 if (assetsFile != null)
                 {
                     assetFiles.Add(assetsFile);
-                    AnalyzeProject(context, assetsFile, path.GetFilename().FullPath);
+                    AnalyzeProject(context, assetsFile, version, copyright, path.GetFilename().FullPath);
                 }
             }
 
@@ -95,19 +96,18 @@ internal class DotnetAnalyzer : Analyzer
         else if (extension.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ||
                  extension.Equals(".fsproj", StringComparison.OrdinalIgnoreCase))
         {
-            var assetsFile = ReadAssetFile(context, path);
+            var (version, copyright, analyzerResult) = PerformDesignTimeBuild(context, path);
+            var assetsFile = ReadAssetFile(context, path, analyzerResult);
             if (assetsFile != null)
             {
-                AnalyzeProject(context, assetsFile);
+                AnalyzeProject(context, assetsFile, version, copyright);
                 AnalyzeProjectDependencies(context, assetsFile);
             }
         }
     }
 
-    private void AnalyzeProject(AnalysisContext context, AssetFile assets, string? group = null)
+    private void AnalyzeProject(AnalysisContext context, AssetFile assets, NuGetVersion? version, string? copyright, string? group = null)
     {
-        var (version, copyright) = PerformDesignTimeBuild(context, assets);
-
         // Add project as a component
         context
             .AddComponent(
@@ -218,14 +218,15 @@ internal class DotnetAnalyzer : Analyzer
         return true;
     }
 
-    private AssetFile? ReadAssetFile(AnalysisContext context, FilePath path)
+    private AssetFile? ReadAssetFile(AnalysisContext context, FilePath path, IAnalyzerResult? analyzerResult)
     {
-        path = path.GetDirectory().CombineWithFilePath("obj/project.assets.json");
+        path = analyzerResult?.GetProperty("ProjectAssetsFile") ?? path.GetDirectory().CombineWithFilePath("obj/project.assets.json");
 
         var assets = _assetFileReader.ReadAssetFile(path);
         if (assets == null)
         {
-            context.AddError($"Could not find [yellow]project.assets.json[/] at [yellow]{path}[/]");
+            var designTimeHint = analyzerResult is null ? $" Consider using [yellow]{DesignTimeBuildFlag}[/] flag if you are using the [yellow]UseArtifactsOutput[/] msbuild property." : string.Empty;
+            context.AddError($"Could not find [yellow]project.assets.json[/] at [yellow]{path}[/]{designTimeHint}");
             return null;
         }
 
@@ -266,18 +267,18 @@ internal class DotnetAnalyzer : Analyzer
         return null;
     }
 
-    private (NuGetVersion? Version, string? Copyright) PerformDesignTimeBuild(AnalysisContext context, AssetFile assets)
+    private (NuGetVersion? Version, string? Copyright, IAnalyzerResult? AnalyzerResult) PerformDesignTimeBuild(AnalysisContext context, FilePath projectFilePath)
     {
         if (!context.Cli.GetOption<bool>(DesignTimeBuildFlag))
         {
-            return (null, null);
+            return (null, null, null);
         }
 
-        var analyzer = _analyzerManager.GetProject(assets.Project.Restore.ProjectPath.FullPath);
+        var analyzer = _analyzerManager.GetProject(projectFilePath.FullPath);
         var result = analyzer.Build().Results.FirstOrDefault();
         if (result == null)
         {
-            return (Version: null, Copyright: null);
+            return (Version: null, Copyright: null, AnalyzerResult: null);
         }
 
         var nugetVersion = default(NuGetVersion);
@@ -288,6 +289,6 @@ internal class DotnetAnalyzer : Analyzer
 
         result.Properties.TryGetValue("Copyright", out var copyright);
 
-        return (nugetVersion, copyright);
+        return (nugetVersion, copyright, result);
     }
 }
