@@ -10,7 +10,7 @@ namespace Covenant.Tests;
 public class CycloneDxSerializerTests
 {
     [Fact]
-    public void ShouldSerializeValidXmlWhenAllBomLicenseMembersAreNotNull()
+    public void Should_Serialize_Valid_Xml_When_BomLicense_Has_More_Details_Than_License_Expression()
     {
         var bom = new Bom("test", "1.0")
         {
@@ -18,30 +18,68 @@ public class CycloneDxSerializerTests
             {
                 new BomComponent("purl", "name", "version", BomComponentKind.Library)
                 {
-                    License = new BomLicense { Id = "MIT", Expression = "MIT", Name = "MIT", Text = Base64EncodedText.Encode("MIT License"), Url = "https://spdx.org/licenses/MIT.html" },
+                    License = new BomLicense
+                    {
+                        Id = "MIT",
+                        Expression = "MIT",
+                        Name = "MIT",
+                        Text = Base64EncodedText.Encode("MIT License"),
+                        Url = "https://spdx.org/licenses/MIT.html",
+                    },
                 },
             },
             Dependencies = new List<BomDependency>(),
         };
 
-        var serializer = new CycloneDxSerializer();
-
-        var cycloneDxBom = serializer.Serialize(bom, new BomSerializerSettings(), new DefaultValueCommandLineResolver());
-        cycloneDxBom.ShouldNotBeNull();
-        var document = ParseBom(cycloneDxBom);
-
+        var document = Serialize(bom);
         var validator = new CycloneDxValidator("./schemas/CycloneDX");
         validator.Validate(document);
     }
 
-    private XDocument ParseBom(string text)
+    [Fact]
+    public void Should_Serialize_Single_License_Expression()
+    {
+        var bom = new Bom("test", "1.0")
+        {
+            Components = new List<BomComponent>
+            {
+                new BomComponent("purl", "name", "version", BomComponentKind.Library)
+                {
+                    License = new BomLicense
+                    {
+                        Id = "MIT",
+                        Expression = "MIT",
+                        Name = "MIT",
+                        Text = Base64EncodedText.Encode("MIT License"),
+                        Url = "https://spdx.org/licenses/MIT.html",
+                    },
+                },
+            },
+            Dependencies = new List<BomDependency>(),
+        };
+
+        var document = Serialize(bom);
+        var component = document.ShouldHaveSingleComponent();
+        var expression = component.ShouldHaveOneLicenseExpression();
+        expression.Value.ShouldBe("MIT");
+    }
+
+    private static XDocument Serialize(Bom bom)
+    {
+        var serializer = new CycloneDxSerializer();
+        var content = serializer.Serialize(bom, new BomSerializerSettings(), new DefaultValueCommandLineResolver());
+        content.ShouldNotBeNull();
+        return ParseBom(content);
+    }
+
+    private static XDocument ParseBom(string text)
     {
         text = RemoveByteOrderMark(text);
         var document = XDocument.Parse(text, LoadOptions.SetLineInfo | LoadOptions.PreserveWhitespace);
         return document;
     }
 
-    private string RemoveByteOrderMark(string text)
+    private static string RemoveByteOrderMark(string text)
     {
         var byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
         if (text.StartsWith(byteOrderMarkUtf8))
@@ -54,6 +92,6 @@ public class CycloneDxSerializerTests
 
     public class DefaultValueCommandLineResolver : ICommandLineResolver
     {
-        public T? GetOption<T>(string alias) => default(T);
+        public T? GetOption<T>(string alias) => default;
     }
 }
