@@ -224,6 +224,7 @@ internal static class CycloneDxConverter
         if (license.Expression != null)
         {
             choice.Expression = license.Expression;
+            return choice;
         }
 
         if (license.Id != null)

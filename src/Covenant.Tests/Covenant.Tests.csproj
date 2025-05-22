@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Covenant\Covenant.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\schemas\**\*.xsd" Link="schemas\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
