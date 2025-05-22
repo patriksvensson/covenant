@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup Label="Settings">
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <Deterministic>true</Deterministic>
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
