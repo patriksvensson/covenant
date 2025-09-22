@@ -1,8 +1,6 @@
 using System.Security.Cryptography;
 using System.Threading;
 using Buildalyzer;
-using CycloneDX.Models;
-using Microsoft.Build.Construction;
 using Microsoft.VisualStudio.SolutionPersistence;
 using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 
@@ -58,10 +56,10 @@ internal class DotnetAnalyzer : Analyzer
 
     public override bool CanHandle(AnalysisContext context, FilePath path)
     {
-        var ext = path.GetExtension();
-        var isSolution = ext != null && _solutionExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase);
-        var isCsProject = path.GetExtension()?.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ?? false;
-        var isFsProject = path.GetExtension()?.Equals(".fsproj", StringComparison.OrdinalIgnoreCase) ?? false;
+        var extension = path.GetExtension() ?? string.Empty;
+        var isSolution = _solutionExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
+        var isCsProject = extension.Equals(".csproj", StringComparison.OrdinalIgnoreCase);
+        var isFsProject = extension.Equals(".fsproj", StringComparison.OrdinalIgnoreCase);
         return isSolution || isCsProject || isFsProject;
     }
 
@@ -70,7 +68,7 @@ internal class DotnetAnalyzer : Analyzer
         path = path.MakeAbsolute(_environment);
         var extension = path.GetExtension() ?? string.Empty;
 
-        if (extension.Equals(".sln", StringComparison.OrdinalIgnoreCase) || extension.Equals(".slnx", StringComparison.OrdinalIgnoreCase))
+        if (_solutionExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
         {
             // Analyze solution
             ISolutionSerializer? serializer = SolutionSerializers.GetSerializerByMoniker(path.FullPath);
@@ -78,7 +76,6 @@ internal class DotnetAnalyzer : Analyzer
             {
                 return;
             }
-
             var solution = serializer.OpenAsync(path.FullPath, CancellationToken.None).Result;
 
             // Add all components in all projects
