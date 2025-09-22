@@ -76,6 +76,7 @@ internal class DotnetAnalyzer : Analyzer
             {
                 return;
             }
+
             var solution = serializer.OpenAsync(path.FullPath, CancellationToken.None).Result;
 
             // Add all components in all projects
