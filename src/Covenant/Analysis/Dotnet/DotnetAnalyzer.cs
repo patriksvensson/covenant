@@ -1,6 +1,10 @@
 using System.Security.Cryptography;
+using System.Threading;
 using Buildalyzer;
+using CycloneDX.Models;
 using Microsoft.Build.Construction;
+using Microsoft.VisualStudio.SolutionPersistence;
+using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 
 namespace Covenant.Analysis.Dotnet;
 
@@ -16,9 +20,10 @@ internal class DotnetAnalyzer : Analyzer
     private readonly DotnetAssetFileReader _assetFileReader;
     private readonly AnalyzerManager _analyzerManager;
     private bool _enabled = true;
+    private static readonly string[] _solutionExtensions = new[] { ".sln", ".slnx" };
 
     public override bool Enabled => _enabled;
-    public override string[] Patterns { get; } = new[] { "**/*.sln" };
+    public override string[] Patterns { get; } = _solutionExtensions.Select(e => $"**/*{e}").ToArray();
 
     public DotnetAnalyzer(
         IFileSystem fileSystem, IEnvironment environment, IGlobber globber)
@@ -53,7 +58,8 @@ internal class DotnetAnalyzer : Analyzer
 
     public override bool CanHandle(AnalysisContext context, FilePath path)
     {
-        var isSolution = path.GetExtension()?.Equals(".sln", StringComparison.OrdinalIgnoreCase) ?? false;
+        var ext = path.GetExtension();
+        var isSolution = ext != null && _solutionExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase);
         var isCsProject = path.GetExtension()?.Equals(".csproj", StringComparison.OrdinalIgnoreCase) ?? false;
         var isFsProject = path.GetExtension()?.Equals(".fsproj", StringComparison.OrdinalIgnoreCase) ?? false;
         return isSolution || isCsProject || isFsProject;
@@ -64,22 +70,23 @@ internal class DotnetAnalyzer : Analyzer
         path = path.MakeAbsolute(_environment);
         var extension = path.GetExtension() ?? string.Empty;
 
-        if (extension.Equals(".sln", StringComparison.OrdinalIgnoreCase))
+        if (extension.Equals(".sln", StringComparison.OrdinalIgnoreCase) || extension.Equals(".slnx", StringComparison.OrdinalIgnoreCase))
         {
             // Analyze solution
-            var solution = SolutionFile.Parse(path.FullPath);
+            ISolutionSerializer? serializer = SolutionSerializers.GetSerializerByMoniker(path.FullPath);
+            if (serializer is null)
+            {
+                return;
+            }
 
-            // Collect all projects
-            var projects = solution.ProjectsInOrder.Where(
-                csproj => csproj.ProjectType != SolutionProjectType.SolutionFolder
-                    && csproj.ProjectType != SolutionProjectType.Unknown);
+            var solution = serializer.OpenAsync(path.FullPath, CancellationToken.None).Result;
 
             // Add all components in all projects
             var assetFiles = new List<AssetFile>();
-            foreach (var csproj in projects)
+            foreach (var csproj in solution.SolutionProjects)
             {
-                var (version, copyright, analyzerResult) = PerformDesignTimeBuild(context, csproj.AbsolutePath);
-                var assetsFile = ReadAssetFile(context, csproj.AbsolutePath, analyzerResult);
+                var (version, copyright, analyzerResult) = PerformDesignTimeBuild(context, csproj.FilePath);
+                var assetsFile = ReadAssetFile(context, csproj.FilePath, analyzerResult);
                 if (assetsFile != null)
                 {
                     assetFiles.Add(assetsFile);
