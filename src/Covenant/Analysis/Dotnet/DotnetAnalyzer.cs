@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Threading;
 using Buildalyzer;
+using Buildalyzer.IO;
 using Microsoft.VisualStudio.SolutionPersistence;
 using Microsoft.VisualStudio.SolutionPersistence.Serializer;
 
@@ -85,7 +86,7 @@ internal class DotnetAnalyzer : Analyzer
             {
                 // Ensure the relative paths found in solutions are resolved relative to the .sln file, rather than the working directory
 				var csprojPath = FilePath.FromString(csproj.FilePath).MakeAbsolute(path.GetDirectory());
-                if (CanHandle(context, csprojPath))            
+                if (CanHandle(context, csprojPath))
                 {
                 	var (version, copyright, analyzerResult) = PerformDesignTimeBuild(context, csprojPath);
                 	var assetsFile = ReadAssetFile(context, csprojPath, analyzerResult);
@@ -284,7 +285,12 @@ internal class DotnetAnalyzer : Analyzer
             return (null, null, null);
         }
 
-        var analyzer = _analyzerManager.GetProject(projectFilePath.FullPath);
+        var analyzer = _analyzerManager.GetProject(IOPath.Parse(projectFilePath.FullPath));
+        if (analyzer == null)
+        {
+            return (Version: null, Copyright: null, AnalyzerResult: null);
+        }
+
         var result = analyzer.Build().Results.FirstOrDefault();
         if (result == null)
         {

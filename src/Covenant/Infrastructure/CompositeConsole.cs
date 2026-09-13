@@ -42,4 +42,10 @@ internal sealed class CompositeConsole : IConsole, IAnsiConsole
     {
         AnsiConsole.Console.Write(renderable);
     }
+
+    public void WriteAnsi(Action<AnsiWriter> action)
+    {
+        AnsiConsole.Console.WriteAnsi(action);
+    }
+
 }
